@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Cloud SQL: Comprehensive Analysis</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #4285f4, #34a853);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .nav-tabs {
+        display: flex;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .nav-tab {
+        flex: 1;
+        padding: 15px 20px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+      }
+
+      .nav-tab:hover {
+        background: rgba(66, 133, 244, 0.1);
+      }
+
+      .nav-tab.active {
+        background: white;
+        border-bottom-color: #4285f4;
+        color: #4285f4;
+      }
+
+      .tab-content {
+        display: none;
+        padding: 40px;
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+      }
+
+      .service-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 5px solid;
+      }
+
+      .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .google-card {
+        border-left-color: #4285f4;
+      }
+      .aws-card {
+        border-left-color: #ff9900;
+      }
+      .azure-card {
+        border-left-color: #0078d4;
+      }
+      .oracle-card {
+        border-left-color: #f80000;
+      }
+
+      .service-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .service-logo {
+        width: 40px;
+        height: 40px;
+        margin-right: 15px;
+        border-radius: 8px;
+      }
+
+      .service-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .feature-list {
+        list-style: none;
+      }
+
+      .feature-list li {
+        padding: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .feature-list li::before {
+        content: "✓";
+        color: #4caf50;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .pros-cons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .pros,
+      .cons {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      .pros h4 {
+        color: #4caf50;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+      }
+
+      .cons h4 {
+        color: #f44336;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+      }
+
+      .rating-section {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin: 30px 0;
+      }
+
+      .rating-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .rating-item {
+        text-align: center;
+      }
+
+      .rating-score {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .stars {
+        color: #ffd700;
+        margin-bottom: 10px;
+      }
+
+      .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 30px 0;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .comparison-table th {
+        background: #4285f4;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+      }
+
+      .comparison-table td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .comparison-table tr:hover {
+        background: #f8f9fa;
+      }
+
+      .highlight {
+        background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+
+      .pricing-card {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        padding: 25px;
+        border-radius: 15px;
+        margin: 20px 0;
+      }
+
+      .pricing-tier {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+      }
+
+      .icon {
+        margin-right: 8px;
+      }
+
+      .recommendation {
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        padding: 25px;
+        border-radius: 15px;
+        margin: 30px 0;
+        border-left: 5px solid #4caf50;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🗃️ Google Cloud SQL</h1>
+        <p>Comprehensive Comparison & Review of Managed Database Services</p>
+      </div>
+
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('overview')">
+          Overview
+        </button>
+        <button class="nav-tab" onclick="showTab('comparison')">
+          Competitor Analysis
+        </button>
+        <button class="nav-tab" onclick="showTab('detailed-review')">
+          Detailed Review
+        </button>
+        <button class="nav-tab" onclick="showTab('pricing')">
+          Pricing Analysis
+        </button>
+        <button class="nav-tab" onclick="showTab('recommendation')">
+          Recommendations
+        </button>
+      </div>
+
+      <div id="overview" class="tab-content active">
+        <h2>Google Cloud SQL Overview</h2>
+        <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px">
+          Google Cloud SQL is a fully managed relational database service that
+          makes it easy to set up, maintain, manage, and administer relational
+          databases on Google Cloud Platform.
+        </p>
+
+        <div class="service-card google-card">
+          <div class="service-header">
+            <div
+              class="service-logo"
+              style="
+                background: #4285f4;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+              "
+            >
+              G
+            </div>
+            <div class="service-title">Google Cloud SQL</div>
+          </div>
+
+          <h4>Supported Database Engines:</h4>
+          <ul class="feature-list">
+            <li>MySQL (5.6, 5.7, 8.0)</li>
+            <li>PostgreSQL (9.6, 10, 11, 12, 13, 14, 15)</li>
+            <li>SQL Server (2017, 2019, 2022)</li>
+          </ul>
+
+          <h4 style="margin-top: 20px">Key Features:</h4>
+          <ul class="feature-list">
+            <li>Automatic backups and point-in-time recovery</li>
+            <li>High availability with automatic failover</li>
+            <li>Read replicas for scaling read workloads</li>
+            <li>Automatic storage increases</li>
+            <li>Database migrations using Database Migration Service</li>
+            <li>Integration with Google Cloud services</li>
+          </ul>
+        </div>
+
+        <div class="rating-section">
+          <h3 style="text-align: center; margin-bottom: 30px">
+            Overall Rating Snapshot
+          </h3>
+          <div class="rating-grid">
+            <div class="rating-item">
+              <div class="rating-score">4.2/5</div>
+              <div class="stars">★★★★☆</div>
+              <div>Performance</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-score">4.5/5</div>
+              <div class="stars">★★★★★</div>
+              <div>Ease of Use</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-score">4.0/5</div>
+              <div class="stars">★★★★☆</div>
+              <div>Cost Efficiency</div>
+            </div>
+            <div class="rating-item">
+              <div class="rating-score">4.4/5</div>
+              <div class="stars">★★★★★</div>
+              <div>Integration</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="comparison" class="tab-content">
+        <h2>Major Database Service Comparison</h2>
+
+        <div class="comparison-grid">
+          <div class="service-card google-card">
+            <div class="service-header">
+              <div
+                class="service-logo"
+                style="
+                  background: #4285f4;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                G
+              </div>
+              <div class="service-title">Google Cloud SQL</div>
+            </div>
+            <ul class="feature-list">
+              <li>3 database engines</li>
+              <li>Enterprise & Enterprise Plus editions</li>
+              <li>Data cache for 3x performance boost</li>
+              <li>Automatic storage scaling</li>
+              <li>Cross-region automated backups</li>
+              <li>Integration with GCP ecosystem</li>
+            </ul>
+          </div>
+
+          <div class="service-card aws-card">
+            <div class="service-header">
+              <div
+                class="service-logo"
+                style="
+                  background: #ff9900;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                A
+              </div>
+              <div class="service-title">Amazon RDS</div>
+            </div>
+            <ul class="feature-list">
+              <li>8 database engines (most comprehensive)</li>
+              <li>Multiple deployment options</li>
+              <li>Performance Insights</li>
+              <li>Aurora serverless option</li>
+              <li>Cross-region automated backups</li>
+              <li>Extensive third-party integrations</li>
+            </ul>
+          </div>
+
+          <div class="service-card azure-card">
+            <div class="service-header">
+              <div
+                class="service-logo"
+                style="
+                  background: #0078d4;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                A
+              </div>
+              <div class="service-title">Azure SQL Database</div>
+            </div>
+            <ul class="feature-list">
+              <li>SQL Server focus with advanced features</li>
+              <li>Hyperscale tier for large databases</li>
+              <li>Built-in AI optimization</li>
+              <li>Advanced threat protection</li>
+              <li>Elastic pools for cost optimization</li>
+              <li>Strong Microsoft ecosystem integration</li>
+            </ul>
+          </div>
+
+          <div class="service-card oracle-card">
+            <div class="service-header">
+              <div
+                class="service-logo"
+                style="
+                  background: #f80000;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: bold;
+                "
+              >
+                O
+              </div>
+              <div class="service-title">Oracle Cloud</div>
+            </div>
+            <ul class="feature-list">
+              <li>Oracle Database expertise</li>
+              <li>Autonomous Database options</li>
+              <li>Exadata Cloud Service</li>
+              <li>Advanced security features</li>
+              <li>Enterprise-grade performance</li>
+              <li>Strong for Oracle workloads</li>
+            </ul>
+          </div>
+        </div>
+
+        <table class="comparison-table">
+          <tr>
+            <th>Feature</th>
+            <th>Google Cloud SQL</th>
+            <th>AWS RDS</th>
+            <th>Azure SQL Database</th>
+          </tr>
+          <tr>
+            <td><strong>Database Engines</strong></td>
+            <td>MySQL, PostgreSQL, SQL Server</td>
+            <td class="highlight">
+              MySQL, PostgreSQL, MariaDB, SQL Server, Oracle, Aurora
+            </td>
+            <td>SQL Server (primary focus)</td>
+          </tr>
+          <tr>
+            <td><strong>Max Storage</strong></td>
+            <td>128 TB</td>
+            <td class="highlight">128 TB (Aurora up to 128 TB auto-scaling)</td>
+            <td>100 TB</td>
+          </tr>
+          <tr>
+            <td><strong>Backup Retention</strong></td>
+            <td>Up to 365 days</td>
+            <td>Up to 35 days</td>
+            <td class="highlight">Up to 35 days (long-term up to 10 years)</td>
+          </tr>
+          <tr>
+            <td><strong>Read Replicas</strong></td>
+            <td>Up to 10</td>
+            <td class="highlight">Up to 15 (Aurora up to 15)</td>
+            <td>Up to 4 (depending on service tier)</td>
+          </tr>
+          <tr>
+            <td><strong>Global Distribution</strong></td>
+            <td>Cross-region replicas</td>
+            <td class="highlight">Multi-region, Global Database</td>
+            <td>Active geo-replication</td>
+          </tr>
+        </table>
+      </div>
+
+      <div id="detailed-review" class="tab-content">
+        <h2>Detailed Google Cloud SQL Review</h2>
+
+        <div class="pros-cons">
+          <div class="pros">
+            <h4><span class="icon">✅</span>Strengths</h4>
+            <ul>
+              <li>
+                <strong>User-Friendly Interface:</strong> Intuitive Google Cloud
+                Console
+              </li>
+              <li>
+                <strong>Automatic Management:</strong> Handles patches, backups,
+                and failover
+              </li>
+              <li>
+                <strong>Performance:</strong> Enterprise Plus offers 3x read
+                performance boost
+              </li>
+              <li>
+                <strong>Integration:</strong> Seamless GCP service integration
+              </li>
+              <li>
+                <strong>Security:</strong> Encryption at rest and in transit by
+                default
+              </li>
+              <li>
+                <strong>Cost-Effective:</strong> Per-second billing and
+                automatic scaling
+              </li>
+              <li>
+                <strong>Migration Tools:</strong> Comprehensive Database
+                Migration Service
+              </li>
+            </ul>
+          </div>
+          <div class="cons">
+            <h4><span class="icon">❌</span>Limitations</h4>
+            <ul>
+              <li>
+                <strong>Fewer Engine Options:</strong> Only 3 vs AWS RDS's 8
+                engines
+              </li>
+              <li>
+                <strong>Limited Customization:</strong> Less control over
+                underlying infrastructure
+              </li>
+              <li>
+                <strong>Regional Availability:</strong> Fewer regions than AWS
+              </li>
+              <li>
+                <strong>Advanced Features:</strong> Some enterprise features lag
+                behind competitors
+              </li>
+              <li>
+                <strong>Vendor Lock-in:</strong> Tight integration can make
+                migration challenging
+              </li>
+              <li>
+                <strong>Support Response:</strong> Can be slower than premium
+                AWS/Azure support
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rating-section">
+          <h3>Detailed Performance Analysis</h3>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 20px;
+              margin-top: 20px;
+            "
+          >
+            <div>
+              <h4>Query Performance</h4>
+              <div class="rating-score">Good</div>
+              <p>
+                Enterprise Plus edition provides significant read performance
+                improvements with data caching
+              </p>
+            </div>
+            <div>
+              <h4>Scalability</h4>
+              <div class="rating-score">Very Good</div>
+              <p>
+                Automatic storage scaling and read replicas handle most scaling
+                scenarios well
+              </p>
+            </div>
+            <div>
+              <h4>Availability</h4>
+              <div class="rating-score">Excellent</div>
+              <p>99.95% SLA with automatic failover and cross-region backups</p>
+            </div>
+            <div>
+              <h4>Security</h4>
+              <div class="rating-score">Excellent</div>
+              <p>
+                Encryption by default, IAM integration, and VPC connectivity
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="recommendation">
+          <h3>
+            <span class="icon">💡</span>Best Use Cases for Google Cloud SQL
+          </h3>
+          <ul style="list-style: none; padding: 0">
+            <li style="padding: 10px 0">
+              <strong>🎯 Small to Medium Applications:</strong> Perfect for
+              startups and growing businesses
+            </li>
+            <li style="padding: 10px 0">
+              <strong>🔗 GCP-Native Apps:</strong> Excellent for applications
+              already using Google Cloud services
+            </li>
+            <li style="padding: 10px 0">
+              <strong>📊 Analytics Workloads:</strong> Great integration with
+              BigQuery and other analytics tools
+            </li>
+            <li style="padding: 10px 0">
+              <strong>🚀 Rapid Prototyping:</strong> Quick setup and minimal
+              management overhead
+            </li>
+            <li style="padding: 10px 0">
+              <strong>💰 Cost-Conscious Projects:</strong> Competitive pricing
+              with per-second billing
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="pricing" class="tab-content">
+        <h2>Pricing Analysis (2024)</h2>
+
+        <div class="pricing-card">
+          <h3>Google Cloud SQL Pricing Structure</h3>
+          <div class="pricing-tier">
+            <h4>Enterprise Edition</h4>
+            <p>
+              <strong>vCPU:</strong> ~$0.0515/hour |
+              <strong>Memory:</strong> ~$0.0092/GB/hour
+            </p>
+            <p>
+              <strong>SSD Storage:</strong> $0.222/GB/month |
+              <strong>HDD Storage:</strong> $0.118/GB/month
+            </p>
+          </div>
+          <div class="pricing-tier">
+            <h4>Enterprise Plus Edition</h4>
+            <p>
+              <strong>vCPU:</strong> ~$0.108/hour (HA setup) |
+              <strong>Enhanced Performance Features</strong>
+            </p>
+            <p>
+              <strong>Data Cache:</strong> Included |
+              <strong>Backup Storage:</strong> $0.105/GB/month
+            </p>
+          </div>
+        </div>
+
+        <table class="comparison-table">
+          <tr>
+            <th>Service</th>
+            <th>Starting Price</th>
+            <th>Storage Cost</th>
+            <th>Backup Cost</th>
+            <th>Data Transfer</th>
+          </tr>
+          <tr>
+            <td><strong>Google Cloud SQL</strong></td>
+            <td>$0.0515/vCPU/hour</td>
+            <td>$0.118-$0.222/GB/month</td>
+            <td>$0.105/GB/month</td>
+            <td>Free within region</td>
+          </tr>
+          <tr>
+            <td><strong>AWS RDS</strong></td>
+            <td>$0.017/hour (db.t3.micro)</td>
+            <td>$0.115-$0.125/GB/month</td>
+            <td>Free up to DB size</td>
+            <td>$0.02/GB after 1GB free</td>
+          </tr>
+          <tr>
+            <td><strong>Azure SQL Database</strong></td>
+            <td>$0.000548/DTU/hour</td>
+            <td>$0.115/GB/month</td>
+            <td>$0.095/GB/month</td>
+            <td>$0.087/GB</td>
+          </tr>
+        </table>
+
+        <div class="recommendation">
+          <h3>💰 Cost Optimization Tips</h3>
+          <ul style="list-style: none; padding: 0">
+            <li style="padding: 8px 0">
+              <strong>Right-size instances:</strong> Monitor CPU and memory
+              usage regularly
+            </li>
+            <li style="padding: 8px 0">
+              <strong>Use committed use discounts:</strong> Up to 57% savings
+              for long-term commitments
+            </li>
+            <li style="padding: 8px 0">
+              <strong>Choose appropriate storage:</strong> Use HDD for less
+              critical, infrequently accessed data
+            </li>
+            <li style="padding: 8px 0">
+              <strong>Optimize backup retention:</strong> Don't keep backups
+              longer than necessary
+            </li>
+            <li style="padding: 8px 0">
+              <strong>Consider regional placement:</strong> Some regions offer
+              lower pricing
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="recommendation" class="tab-content">
+        <h2>Final Recommendations</h2>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+          "
+        >
+          <div class="service-card google-card">
+            <h3>✅ Choose Google Cloud SQL If:</h3>
+            <ul class="feature-list">
+              <li>You're already using Google Cloud Platform</li>
+              <li>You need MySQL, PostgreSQL, or SQL Server</li>
+              <li>You want minimal database management overhead</li>
+              <li>Cost optimization is a priority</li>
+              <li>You're building analytics-heavy applications</li>
+              <li>Your team prefers Google's UX/UI design</li>
+            </ul>
+          </div>
+
+          <div class="service-card aws-card">
+            <h3>⚠️ Consider AWS RDS If:</h3>
+            <ul class="feature-list">
+              <li>You need Oracle, MariaDB, or Aurora</li>
+              <li>You require the most mature ecosystem</li>
+              <li>Global distribution is critical</li>
+              <li>You need maximum feature customization</li>
+              <li>You have complex enterprise requirements</li>
+              <li>Multi-cloud strategy is important</li>
+            </ul>
+          </div>
+
+          <div class="service-card azure-card">
+            <h3>🔄 Consider Azure SQL If:</h3>
+            <ul class="feature-list">
+              <li>You're heavily invested in Microsoft ecosystem</li>
+              <li>You need advanced SQL Server features</li>
+              <li>Hybrid cloud scenarios are important</li>
+              <li>You require built-in AI/ML capabilities</li>
+              <li>Enterprise security is paramount</li>
+              <li>You have existing Microsoft licenses</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rating-section" style="margin-top: 40px">
+          <h3>Overall Verdict: Google Cloud SQL</h3>
+          <div style="text-align: center">
+            <div
+              class="rating-score"
+              style="font-size: 3rem; margin-bottom: 20px"
+            >
+              4.2/5
+            </div>
+            <p style="font-size: 1.2rem; margin-bottom: 30px">
+              <strong>Solid Choice for Most Use Cases</strong>
+            </p>
+            <p
+              style="
+                font-size: 1rem;
+                line-height: 1.6;
+                max-width: 800px;
+                margin: 0 auto;
+              "
+            >
+              Google Cloud SQL offers an excellent balance of ease-of-use,
+              performance, and cost-effectiveness. While it may not have the
+              extensive feature set of AWS RDS or the specialized SQL Server
+              capabilities of Azure, it excels in simplicity and integration
+              within the Google Cloud ecosystem. It's particularly strong for
+              small to medium-sized applications and teams who value minimal
+              operational overhead.
+            </p>
+          </div>
+        </div>
+
+        <div class="recommendation" style="margin-top: 30px">
+          <h3>🎯 Summary Recommendation</h3>
+          <p style="font-size: 1.1rem; line-height: 1.6">
+            <strong>For most organizations</strong>, Google Cloud SQL provides
+            the right balance of features, performance, and cost. It's
+            especially compelling if you're already using Google Cloud services
+            or prefer Google's approach to cloud computing. However, evaluate
+            AWS RDS if you need more database engine options or have complex
+            enterprise requirements, and consider Azure SQL Database if you're
+            deeply integrated with Microsoft technologies.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        // Hide all tab contents
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => content.classList.remove("active"));
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll(".nav-tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show selected tab content
+        document.getElementById(tabName).classList.add("active");
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+    </script>
+  </body>
+</html>
